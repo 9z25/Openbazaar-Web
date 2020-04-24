@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <script src="/public/js/qrcode.min.js"></script>
+      <meta charset="utf-8"/>
+      <title>Freshmint Records Store</title>
+      
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+      
+      <style>
+         body {
+            background-color: lightgrey;
+         }
+         /* The Modal (background) */
+         .modal {
+         display: none; /* Hidden by default */
+         position: fixed; /* Stay in place */
+         z-index: 1; /* Sit on top */
+         left: 0;
+         top: 0;
+         width: 100%; /* Full width */
+         height: 100%; /* Full height */
+         overflow: auto; /* Enable scroll if needed */
+         background-color: rgb(0,0,0); /* Fallback color */
+         background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+         }
+         /* Modal Content/Box */
+         .modal-content {
+         background-color: #fefefe;
+         margin: 15% auto; /* 15% from the top and centered */
+         padding: 20px;
+         border: 1px solid #888;
+         width: 80%; /* Could be more or less, depending on screen size */
+         }
+         /* The Close Button */
+         .close {
+         color: #aaa;
+         float: right;
+         font-size: 28px;
+         font-weight: bold;
+         }
+         .close:hover,
+         .close:focus {
+         color: black;
+         text-decoration: none;
+         cursor: pointer;
+         }
+         .col-sm-4 {
+             border-style: solid;
+             padding: 40px;
+             margin: 10px;
+         }
+         img {
+             border-style: solid;
+             border-width: 1px;
+         }
+      </style>
+   </head>
+<h3>Freshmint Records Store</h3>
+<div class="row">
+  {{ range . }}
+   <div class="col-sm-4">
+      <img src={{index . "image"}}
+       width="200px" /><br/>
+      <h4>{{index . "name"}}</h4>
+      <br/>
+      {{index . "shortDesc"}}
+      <br/><button onClick='checkOut("{{index . "name"}}")'>${{index . "price" }} {{index . "currency" }}</button>
+   </div>
+   {{ end }}
+</div>
+<!-- The Purchase Order Modal -->
+<div id="poModal" class="modal">
+   <!-- Modal content -->
+   <div class="modal-content">
+      <span class="close">&times;</span>
+      <br/>Name<br/><input id="shipTo" type="text" />
+      <br/>Email Address<br/><input id="emailAddress" type="text" />
+      <br/>Address<br/><input id="address" type="text" />
+      <br/>City<br/><input id="city" type="text" />
+      <br/>State<br/><input id="state" type="text" />
+      <br/>Country<br/><input id="country" type="text" />
+      <br/>Postal Code<br/><input id="postalCode" type="text" />
+      <br/><button id="buy-button">Buy</button>
+   </div>
+</div>
+
+
+<!-- The Modal -->
+<div id="addressModal" class="modal">
+   <!-- Modal content -->
+   <div class="modal-content">
+      <span class="close">&times;</span>
+      <input type="text" id="qr-data" />
+      <div id="qrcode"></div>
+      <h3>.00001 BCH</h3>
+      <p>Receive download after making payment</p>
+   </div>
+</div>
+
+<script>
+   var name;
+   var buyBtn = document.getElementById("buy-button");
+   var modal = document.getElementById("addressModal");
+   var poModal = document.getElementById("poModal");
+   
+   poModal.style.display = "none";
+   modal.style.display = "none";
+
+   window.onclick = function(event) {
+   if (event.target == modal) {
+      modal.style.display = "none";
+   }
+   }
+
+
+   var span = document.getElementsByClassName("close")[0];
+   span.onclick = function() {
+      modal.style.display = "none";
+   }
+
+   var span = document.getElementsByClassName("close")[1];
+   span.onclick = function() {
+      modal.style.display = "none";
+   }
+   
+   
+   function checkOut(product){
+      name = product;
+      poModal.style.display = "block";
+   }
+
+   buyBtn.onclick = () => {
+      //window.location.href = "http://localhost:8000/download?fileName=" ++ "&token=" + token;
+      var poData = {};
+      poData.shipTo = document.getElementById("shipTo").value.toString();
+      poData.emailAddress = document.getElementById("emailAddress").value.toString();
+      poData.address = document.getElementById("address").value.toString();
+      poData.city = document.getElementById("city").value.toString();
+      poData.state = document.getElementById("state").value.toString();
+      poData.country = document.getElementById("country").value.toString();
+      poData.postalCode = document.getElementById("postalCode").value.toString();
+      poData.paymentCoin = "BCH";
+      poData.amount = "1000"
+      
+      poData.product = name;
+      console.log(JSON.stringify(poData))
+      
+      fetch('http://localhost:8000/api/purchase/', {
+            method: "post",
+            body: JSON.stringify(poData)
+         })
+         .then((response) => {
+            return response.json();
+         })
+         .then((data) => {
+            console.log(data);
+            var i = 0;
+            // Load second modal
+         poModal.style.display = "none";
+         modal.style.display = "block";
+         document.getElementById('qr-data').value = data.paymentAddress
+         generateQR();
+         
+         var tid = setInterval(() => {
+            fetch('http://localhost:8000/api/salecomplete/')
+            .then((response) => {
+               return response.json();
+            })
+            .then((data) => {
+               console.log(data.bool);
+               if (i == 30) {
+                  clearInterval(tid);
+                  modal.style.display = "none";
+                  return;
+               }
+               if(data.bool == "true") {
+                  clearInterval(tid);
+                  console.log(data);
+                  window.location.href = "http://localhost:8000/download?fileName=" + name + "&token=" + data.token;
+                  i++;
+               }
+            })
+         }, 2000)
+         })
+   }
+
+   var qrdata = document.getElementById("qr-data");
+         var qrcode = new QRCode(document.getElementById('qrcode'));
+         
+         function generateQR() {
+             var data = qrdata.value;
+             qrcode.makeCode(data);
+         }
+   
+</script>
+
+</body>
+</html>

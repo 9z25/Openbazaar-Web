@@ -1,0 +1,58 @@
+
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <style>
+         body {
+         background-color: lightgrey;
+         }
+         a {
+             background-color: lightpink;
+             border: solid;
+             border-radius: 10%;
+         }
+      </style>
+      <script src="/public/js/FileSaver.js"></script>
+
+   <body>
+      <strong>Enjoy your download!</strong>
+<br/><br/><br/>
+
+<a href="100miles.mp3" download="100miles.mp3">Download</a>
+
+
+
+      <script type="text/javascript">
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+var keys = getUrlVars();
+keys.fileName = keys.fileName.replace("%20", " ");
+alert(JSON.stringify(keys))
+fetch("http://localhost:8000/file/", {
+   headers: "Authorization: Bearer " + keys.token,
+   method:"POST",
+   body: '{"fileName":"'+ keys.fileName +'"}'
+})
+.then(res => res.blob())
+.then(blob => saveAs(blob, "Hot Potato.mp3"));
+/*
+        function saveFile()
+        {
+            var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+            saveAs(blob, "hello world.txt");
+        }
+
+        saveFile();
+*/
+var url ="file:///home/syndrome/windowshop/100miles.mp3";
+var fileName = "100miles.mp3"
+     </script>
+   </body>
+</html>
+

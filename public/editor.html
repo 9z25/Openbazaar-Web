@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css" />
+    </head>
+    <body>
+        <textarea id="html-ta">
+            {{index . "html"}}
+        </textarea>
+        <script>
+            myTextarea = document.getElementById("html-ta");
+            var editor = CodeMirror.fromTextArea(myTextarea, {
+              mode: "text/html",
+              lineNumbers: true
+            });
+        </script>
+    </body>
+</html>

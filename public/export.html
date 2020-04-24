@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/public/css/styles.css">
+  
+</head>
+<body>
+  <ul id="myUL">
+    <li><span class="caret">Download</span>
+      <ul class="nested">
+        <li>Water</li>
+        <li>Coffee</li> 
+      </ul>
+    </li>
+  </ul>
+
+<h1>Purchase orders</h1>
+
+<table>
+  <tr>
+    <th>{{index .Headers 1 }}</th>
+    <th>{{index .Headers 2 }}</th>
+    <th>{{index .Headers 3 }}</th>
+    <th>{{index .Headers 4 }}</th>
+    <th>{{index .Headers 5 }}</th>
+    <th>{{index .Headers 6 }}</th>
+    <th>{{index .Headers 7 }}</th>
+    <th>{{index .Headers 8 }}</th>
+    <th>{{index .Headers 9 }}</th>
+    <th>{{index .Headers 10 }}</th>
+    <th>{{index .Headers 11 }}</th>
+    <th>{{index .Headers 12 }}</th>
+  </tr>
+  {{ range .PurchaseOrders }}
+  <tr>
+    <th>{{index . 1 }}</th>
+    <th>{{index . 2 }}</th>
+    <th>{{index . 3 }}</th>
+    <th>{{index . 4 }}</th>
+    <th>{{index . 5 }}</th>
+    <th>{{index . 6 }}</th>
+    <th>{{index . 7 }}</th>
+    <th>{{index . 8 }}</th>
+    <th>{{index . 9 }}</th>
+    <th>{{index . 10 }}</th>
+    <th>{{index . 11 }}</th>
+    <th>{{index . 12 }}</th>
+  </tr>
+  {{ end }}
+</table>
+<script src="/public/js/treeview.js"></script>
+</body>
+</html>
