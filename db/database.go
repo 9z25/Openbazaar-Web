@@ -9,7 +9,7 @@ import (
 //CreateDatabase open db connection
 func CreateDatabase() (*sql.DB, error) {
 
-	db, err := sql.Open("mysql", "richie-admin:GoodFriday@123@/test_user")
+	db, err := sql.Open("mysql", "richie-admin:**OMMITTED**@/test_user")
 	if err != nil {
 		return nil, err
 	}
