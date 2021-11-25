@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"./app"
-	"./db"
+	"github.com/9z25/openbazaar-web/app"
+	"github.com/9z25/openbazaar-web/db"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
